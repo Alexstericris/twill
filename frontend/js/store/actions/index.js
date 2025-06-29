@@ -3,6 +3,8 @@
 /* Blocks */
 export const MOVE_BLOCK_TO_EDITOR = 'moveBlockToEditor'
 export const DUPLICATE_BLOCK = 'duplicateBlock'
+export const COPY_BLOCK = 'copyBlock'
+export const PASTE_BLOCK = 'pasteBlock'
 
 /* Repeaters */
 export const DUPLICATE_REPEATER = 'duplicateRepeater'
@@ -74,5 +76,7 @@ export default {
   GET_CURRENT,
   MOVE_BLOCK_TO_EDITOR,
   DUPLICATE_BLOCK,
+  COPY_BLOCK,
+  PASTE_BLOCK,
   DUPLICATE_REPEATER
 }

@@ -23,6 +23,6 @@ return new Doctum($iterator, [
     'language' => 'en',
     'build_dir' => __DIR__ . '/build/%version%',
     'cache_dir' => __DIR__ . '/cache/%version%',
-    'remote_repository' => new GitHubRemoteRepository('area17/twill', dirname($dir)),
+    'remote_repository' => new GitHubRemoteRepository('alexstericris/twill', dirname($dir)),
     'default_opened_level' => 2,
 ]);

@@ -29,6 +29,9 @@ export default {
     cloneBlock () {
       this.$emit('block:clone')
     },
+    pasteBlock () {
+      this.$emit('block:paste')
+    },
     toggleBlockDropdown () {
       if (this.blocksLength > 1 && this.$refs.blockDropdown) {
         this.$refs.blockDropdown.toggle()

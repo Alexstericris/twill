@@ -48,7 +48,9 @@ const state = {
    * Block that is currently being edited in the visual Editor
    * @type {Object}
    */
-  active: {}
+  active: {},
+
+  blockClipboard: localStorage.getItem('blockClipboard')?JSON.parse(localStorage.getItem('blockClipboard')):null
 }
 
 // getters
@@ -62,7 +64,7 @@ const getters = {
 const setBlockID = () => Date.now() + Math.floor(Math.random() * 1000)
 
 const mutations = {
-  [BLOCKS.ADD_BLOCK] (state, { block, index, editorName }) {
+  [BLOCKS.ADD_BLOCK](state, { block, index, editorName }) {
     const updated = state.blocks[editorName] || []
     const newBlock = { ...block, id: setBlockID(), name: editorName }
 
@@ -78,12 +80,12 @@ const mutations = {
 
     Vue.set(state.blocks, editorName, updated)
   },
-  [BLOCKS.MOVE_BLOCK] (state, { editorName, newIndex, oldIndex }) {
+  [BLOCKS.MOVE_BLOCK](state, { editorName, newIndex, oldIndex }) {
     const updated = state.blocks[editorName] || []
 
     if (newIndex >= updated.length) {
       let k = newIndex - updated.length
-      while ((k--) + 1) {
+      while (k-- + 1) {
         updated.push(undefined)
       }
     }
@@ -92,7 +94,7 @@ const mutations = {
 
     Vue.set(state.blocks, editorName, updated)
   },
-  [BLOCKS.DELETE_BLOCK] (state, { editorName, index }) {
+  [BLOCKS.DELETE_BLOCK](state, { editorName, index }) {
     const id = state.blocks[editorName][index].id
     const updated = state.blocks[editorName] || []
 
@@ -104,27 +106,41 @@ const mutations = {
 
     Vue.set(state.blocks, editorName, updated)
   },
-  [BLOCKS.DUPLICATE_BLOCK] (state, { editorName, index, block, id }) {
+  [BLOCKS.DUPLICATE_BLOCK](state, { editorName, index, block, id }) {
     const updated = state.blocks[editorName] || []
 
     updated.splice(index, 0, { ...block, id, name: editorName })
 
     Vue.set(state.blocks, editorName, updated)
   },
-  [BLOCKS.REORDER_BLOCKS] (state, { editorName, value }) {
+  [BLOCKS.COPY_BLOCK](state, { block }) {
+    localStorage.setItem('blockClipboard', JSON.stringify(block))
+    state.blockClipboard = block
+  },
+  [BLOCKS.PASTE_BLOCK](state, { editorName, index, id }) {
+    console.log('reachy breachy')
+    const updated = state.blocks[editorName] || []
+    updated.splice(index, 0, { ...state.blockClipboard, id, name: editorName })
+    state.blockClipboard = null
+    localStorage.removeItem('blockClipboard')
+    Vue.set(state.blocks, editorName, updated)
+
+    // localStorage.setItem('blockClipboard',JSON.stringify(block))
+  },
+  [BLOCKS.REORDER_BLOCKS](state, { editorName, value }) {
     Vue.set(state.blocks, editorName, value)
   },
-  [BLOCKS.ACTIVATE_BLOCK] (state, { editorName, index }) {
+  [BLOCKS.ACTIVATE_BLOCK](state, { editorName, index }) {
     if (state.blocks[editorName] && state.blocks[editorName][index]) {
       state.active = { ...state.blocks[editorName][index] }
     } else {
       state.active = {}
     }
   },
-  [BLOCKS.ADD_BLOCK_PREVIEW] (state, data) {
+  [BLOCKS.ADD_BLOCK_PREVIEW](state, data) {
     Vue.set(state.previews, data.id, data.html)
   },
-  [BLOCKS.UPDATE_PREVIEW_LOADING] (state, loading) {
+  [BLOCKS.UPDATE_PREVIEW_LOADING](state, loading) {
     state.loading = !state.loading
   }
 }
@@ -189,6 +205,12 @@ const actions = {
   },
   async [ACTIONS.DUPLICATE_BLOCK] ({ commit, state, rootState }, { editorName, futureIndex, block, id }) {
     commit(BLOCKS.DUPLICATE_BLOCK, { editorName, index: futureIndex, block, id })
+  },
+  async [ACTIONS.COPY_BLOCK] ({ commit, state, rootState }, { editorName, futureIndex, block, id }) {
+    commit(BLOCKS.COPY_BLOCK, { editorName, index: futureIndex, block, id })
+  },
+  async [ACTIONS.PASTE_BLOCK] ({ commit, state, rootState }, { editorName, futureIndex, id }) {
+    commit(BLOCKS.PASTE_BLOCK, { editorName, index: futureIndex, id })
   },
   async [ACTIONS.MOVE_BLOCK_TO_EDITOR] ({ commit, dispatch }, { editorName, index, block, futureIndex, id }) {
     await dispatch(ACTIONS.DUPLICATE_BLOCK, {

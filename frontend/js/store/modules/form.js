@@ -360,6 +360,10 @@ const actions = {
   async [ACTIONS.DUPLICATE_BLOCK] ({ commit, getters }, { block, id }) {
     const fields = getters.fieldsByBlockId(block.id)
     commit(FORM.DUPLICATE_BLOCK_FORM_FIELDS, { fields, oldId: block.id, newId: id })
+  },
+  async [ACTIONS.PASTE_BLOCK] ({ commit, getters }, { block, id }) {
+    const fields = getters.fieldsByBlockId(block.id)
+    commit(FORM.DUPLICATE_BLOCK_FORM_FIELDS, { fields, oldId: block.id, newId: id })
   }
 }
 

@@ -78,12 +78,25 @@ export default {
       })
     },
     cloneBlock () {
+      console.log('clone in block editormodel')
+
       this.$store.dispatch(ACTIONS.DUPLICATE_BLOCK, {
+
         editorName: this.editorName,
         futureIndex: this.blockIndex + 1,
         block: this.block,
         id: Date.now() + Math.floor(Math.random() * 1000)
       })
+    },
+    copyBlock () {
+      console.log('test copy')
+
+      // this.$store.dispatch(ACTIONS.DUPLICATE_BLOCK, {
+      //   editorName: this.editorName,
+      //   futureIndex: this.blockIndex + 1,
+      //   block: this.block,
+      //   id: Date.now() + Math.floor(Math.random() * 1000)
+      // })
     },
     setBlockID () {
       return Date.now() + Math.floor(Math.random() * 1000)
@@ -100,7 +113,7 @@ export default {
       remove: this.remove,
       move: this.move,
       duplicate: this.duplicate,
-      cloneBlock: this.cloneBlock
+      copyBlock: this.copyBlock
     })
   }
 }

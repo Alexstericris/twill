@@ -36,7 +36,7 @@ class Twill
         }
 
         return base_path(
-            'vendor/area17/twill/dist/assets/twill/twill-manifest.json'
+            'vendor/alexstericris/twill/dist/assets/twill/twill-manifest.json'
         );
     }
 

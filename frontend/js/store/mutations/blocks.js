@@ -3,6 +3,8 @@ export const ADD_BLOCK = 'addBlock'
 export const MOVE_BLOCK = 'moveBlock'
 export const DELETE_BLOCK = 'deleteBlock'
 export const DUPLICATE_BLOCK = 'duplicateBlock'
+export const COPY_BLOCK = 'copyBlock'
+export const PASTE_BLOCK = 'pasteBlock'
 export const REORDER_BLOCKS = 'reorderBlocks'
 export const ACTIVATE_BLOCK = 'activateBlock'
 export const ADD_BLOCK_PREVIEW = 'addBlockPreview'
@@ -13,6 +15,8 @@ export default {
   MOVE_BLOCK,
   DELETE_BLOCK,
   DUPLICATE_BLOCK,
+  COPY_BLOCK,
+  PASTE_BLOCK,
   REORDER_BLOCKS,
   ACTIVATE_BLOCK,
   ADD_BLOCK_PREVIEW,
