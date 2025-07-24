@@ -42,6 +42,9 @@ if (config('twill.enabled.file-library')) {
 if (config('twill.enabled.block-editor')) {
     Route::post('blocks/preview', ['as' => 'blocks.preview', 'uses' => 'BlocksController@preview']);
 }
+if (config('twill.enabled.ai', true)) {
+    Route::post('ai/prompt', [\A17\Twill\Http\Controllers\Admin\AiController::class,'prompt'])->name('ai.prompt');
+}
 
 if (config('twill.enabled.buckets')) {
     $bucketsRoutes = config('twill.bucketsRoutes') ?? Collection::make(config('twill.buckets'))->mapWithKeys(function ($bucketSection, $bucketSectionKey) {

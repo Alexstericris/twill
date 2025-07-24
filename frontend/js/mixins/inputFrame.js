@@ -29,6 +29,10 @@ export default {
     note: {
       type: String,
       default: ''
+    },
+    hasAiSupport:{
+      type: Boolean,
+      default: false,
     }
   },
   computed: {

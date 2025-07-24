@@ -3,6 +3,7 @@
 namespace A17\Twill\View\Components\Fields;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
 
 class Input extends TwillFormComponent
 {
@@ -32,6 +33,7 @@ class Input extends TwillFormComponent
         public null|int|float $max = null,
         public null|int|float $step = null,
         public ?string $mask = null,
+        public ?bool $hasAiSupport = null,
     ) {
         parent::__construct(
             name: $name,

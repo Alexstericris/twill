@@ -48,6 +48,7 @@
         @if ($inModal) :in-modal="true" @endif
         @isset ($min) :min="{{$min}}" @endisset
         @isset ($max) :max="{{$max}}" @endisset
+        @isset($hasAiSupport) :has-ai-support="{{$hasAiSupport?'true':'false'}}" @endisset
         @if ($step) step="{{$step}}" @endif
         @if ($default)
             :initial-value="'{{ $default }}'"

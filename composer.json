@@ -26,6 +26,7 @@
     "php": "^8.0",
     "ext-json": "*",
     "ext-pdo": "*",
+    "alexstericris/alecris-ai-apis": "dev-main",
     "astrotomic/laravel-translatable": "^v11.12",
     "cartalyst/tags": "^12.0 || ^13.0 || ^14.0",
     "doctrine/dbal": "^3.0 || ^4.0",
@@ -108,5 +109,11 @@
     "allow-plugins": {
       "cweagans/composer-patches": true
     }
-  }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/alexstericris/alecris-ai-apis"
+    }
+  ]
 }

@@ -174,6 +174,7 @@
     availableBlocks: {},
     blocks: {},
     blockPreviewUrl: '{{ $blockPreviewUrl ?? '' }}',
+    aiPromptUrl: '{{ $aiPromptUrl ?? '' }}',
     repeaters: {!! json_encode(($form_fields['repeaters'] ?? []) + ($form_fields['blocksRepeaters'] ?? [])) !!},
     fields: [],
     editor: {{ $editor ? 'true' : 'false' }},

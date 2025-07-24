@@ -62,6 +62,7 @@ const state = {
    * @type {String}
    */
   blockPreviewUrl: window[process.env.VUE_APP_NAME].STORE.form.blockPreviewUrl || '',
+  aiPromptUrl: window[process.env.VUE_APP_NAME].STORE.form.aiPromptUrl || '',
   /**
    * Form errors after submitting
    * @type {Object}
