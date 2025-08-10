@@ -33,6 +33,10 @@ export default {
     hasAiSupport:{
       type: Boolean,
       default: false,
+    },
+    inputValueForAi:{
+      type: null,
+      default: null
     }
   },
   computed: {

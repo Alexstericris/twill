@@ -30,22 +30,32 @@
     <span v-if="otherLocalesError" class="input__errorMessage f--small">{{
       errorMessageLocales
     }}</span>
-    <button
-      v-if="hasAiSupport && !isChatting"
-      type="button"
-      @click="isChatting = true"
+    <div
+      style="display: flex; align-items: center; gap: 0.5rem; margin-top: 16px"
     >
-      Ai
-    </button>
-    <textarea v-if="hasAiSupport && isChatting" v-model="prompt"></textarea>
-    <button
-      v-if="hasAiSupport && isChatting"
-      type="submit"
-      variant="action"
-      @click="promptAi"
-    >
-      Submit
-    </button>
+      <a17-button
+        v-if="hasAiSupport && !isChatting"
+        type="button"
+        variant="action"
+        @click="onChatAi"
+      >
+        Ai Help
+      </a17-button>
+      <textarea
+        v-if="hasAiSupport && isChatting"
+        v-model="prompt"
+        style="flex: 1; resize: vertical; min-height: 2.5rem;     background-color: #fbfbfb;
+        border: 1px solid #d9d9d9;"
+      ></textarea>
+      <a17-button
+        v-if="hasAiSupport && isChatting"
+        type="submit"
+        variant="action"
+        @click="promptAi"
+      >
+        Submit
+      </a17-button>
+    </div>
   </div>
 </template>
 
@@ -55,15 +65,18 @@
   import LocaleMixin from '@/mixins/locale'
   import form from '@/store/api/form'
   import { mapState } from 'vuex'
+  import FormStoreMixin from '@/mixins/formStore'
+  import { FORM } from '@/store/mutations'
 
   export default {
     name: 'A17InputFrame',
-    mixins: [InputMixin, InputframeMixin, LocaleMixin],
+    mixins: [InputMixin, InputframeMixin, LocaleMixin, FormStoreMixin],
     props: {
       addNew: {
         type: String,
         default: ''
-      }
+      },
+
     },
     data: function() {
       return {
@@ -95,9 +108,17 @@
       openAddModal: function() {
         if (this.$parent.$refs.addModal) this.$parent.$refs.addModal.open()
       },
+      onChatAi: function() {
+        this.preventSubmit()
+        this.isChatting = true
+      },
       promptAi: function() {
-        form.post(this.aiPromptUrl, { prompt: this.prompt }, response => {
-          console.log('reachy', response.data)
+        this.$store.commit(FORM.UPDATE_FORM_LOADING, true)
+        const promptWithInput=this.inputValueForAi?'Current: '+this.inputValueForAi +'\n\n':null
+        form.post(this.aiPromptUrl, { prompt: promptWithInput??this.prompt }, response => {
+          this.$emit('aiHelp', { value: response.data })
+          this.allowSubmit()
+          this.$store.commit(FORM.UPDATE_FORM_LOADING, false)
         })
       }
     }
