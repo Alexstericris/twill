@@ -15,7 +15,7 @@
         v-tooltip
         >{{ displayedLocale }}</span
       >
-      <span class="input__note f--small" v-if="note">{{ note }}</span>
+      <span class="input__note f--small" v-if="note"> - {{ note }}</span>
     </label>
     <a href="#" v-if="addNew" @click.prevent="openAddModal" class="input__add"
       ><span v-svg symbol="add"></span>
@@ -159,7 +159,6 @@
       display: inline;
       right: 0;
       top: 1px;
-      position: absolute;
     }
   }
 
