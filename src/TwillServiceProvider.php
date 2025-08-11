@@ -40,6 +40,7 @@ use A17\Twill\Models\Media;
 use A17\Twill\Models\User;
 use A17\Twill\Services\FileLibrary\FileService;
 use A17\Twill\Services\MediaLibrary\ImageService;
+use Alexstericris\AlecrisAiApis\Services\GeminiService;
 use Astrotomic\Translatable\TranslatableServiceProvider;
 use Cartalyst\Tags\TagsServiceProvider;
 use Exception;
@@ -86,6 +87,35 @@ class TwillServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->bind(GeminiService::class, function ($app, $params) {
+            return new GeminiService(config('alecris-ai-apis.gemini.key'), systemPrompts: [
+                'contents' => [
+                    [
+                        'role' => 'user',
+                        'parts' => [
+                            [
+                                'text' => 'Style html elements with tailwind 4 classes. If you style text use the prose plugin syntax. For example, style a div containing text markdown to have padding and border and h1 in text to be blue and all other to be black.',
+                            ],
+                        ],
+                    ],
+                    [
+                        'role' => 'model',
+                        'parts' => [
+                            [
+                                'text' => 'Ok, here is your styled button:
+                                ```html
+                                    <div class="prose prose-black prose-headings:text-black prose-h1:text-blue-500 p-4 border border-gray-300 rounded-lg">
+                                      <h1>Markdown H1 Heading</h1>
+                                      <p>This is some normal paragraph text.</p>
+                                    </div>
+                                ```
+                                ',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        });
         $this->publishConfigs();
         $this->publishMigrations();
         $this->publishAssets();
