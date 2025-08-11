@@ -114,7 +114,7 @@
       },
       promptAi: function() {
         this.$store.commit(FORM.UPDATE_FORM_LOADING, true)
-        const promptWithInput=this.inputValueForAi?'Current: '+this.inputValueForAi +'\n\n':null
+        const promptWithInput=this.inputValueForAi?'Current: '+this.inputValueForAi +'\n\n'+this.prompt:null
         form.post(this.aiPromptUrl, { prompt: promptWithInput??this.prompt }, response => {
           this.$emit('aiHelp', { value: response.data })
           this.allowSubmit()
