@@ -46,7 +46,7 @@
                     class="blocks__addButton"
                     type="button"
                     slot="dropdown-add"
-                    :key="availableBlock.component"
+                    :key="availableBlock.title"
                     @click="handleBlockAdd(add, availableBlock, blockIndex + 1)"
                   >
                     <span
@@ -158,7 +158,7 @@
               <a17-blockeditor-model
                 :editor-name="editorName"
                 :block="availableBlock"
-                :key="availableBlock.component"
+                :key="availableBlock.title"
                 v-slot="{ add, block }"
               >
                 <button
