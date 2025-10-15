@@ -13,4 +13,5 @@ return [
     'role' => A17\Twill\Models\Role::class,
     'group' => A17\Twill\Models\Group::class,
     'block' => A17\Twill\Models\Block::class,
+    'favorite' => A17\Twill\Models\Favorite::class
 ];

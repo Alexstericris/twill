@@ -3,8 +3,12 @@
 namespace A17\Twill\Http\Controllers\Admin;
 
 use A17\Twill\Helpers\BlockRenderer;
+use A17\Twill\Models\Block;
+use A17\Twill\Repositories\BlockRepository;
+use A17\Twill\Repositories\FavoriteRepository;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Routing\ResponseFactory;
 use Illuminate\View\Factory as ViewFactory;
 
 class BlocksController extends Controller
@@ -16,8 +20,9 @@ class BlocksController extends Controller
     public function preview(
         Application $app,
         ViewFactory $viewFactory,
-        Request $request,
-    ): string {
+        Request     $request,
+    ): string
+    {
         if ($request->has('activeLanguage')) {
             $app->setLocale($request->get('activeLanguage'));
         }

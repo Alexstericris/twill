@@ -175,6 +175,7 @@
     blocks: {},
     blockPreviewUrl: '{{ $blockPreviewUrl ?? '' }}',
     aiPromptUrl: '{{ $aiPromptUrl ?? '' }}',
+    toggleBlockIsFavoriteUrl: '{{ $toggleBlockIsFavoriteUrl ?? '' }}',
     repeaters: {!! json_encode(($form_fields['repeaters'] ?? []) + ($form_fields['blocksRepeaters'] ?? [])) !!},
     fields: [],
     editor: {{ $editor ? 'true' : 'false' }},

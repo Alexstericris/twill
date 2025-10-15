@@ -27,24 +27,24 @@ class TwillUtil
      */
     private const BLOCK_ID_INDEX = 'block_ids';
 
-    public function hasRepeaterIdFor(int $frontEndId): ?int
+    public function hasRepeaterIdFor(int|string $frontEndId): ?int
     {
         return $this->getFromTempStore(self::REPEATER_ID_INDEX, $frontEndId);
     }
 
-    public function registerRepeaterId(int $frontEndId, int $dbId): self
+    public function registerRepeaterId(int|string $frontEndId, int $dbId): self
     {
         $this->pushToTempStore(self::REPEATER_ID_INDEX, $frontEndId, $dbId);
 
         return $this;
     }
 
-    public function hasBlockIdFor(int $frontEndId): ?int
+    public function hasBlockIdFor(int|string $frontEndId): ?int
     {
         return $this->getFromTempStore(self::BLOCK_ID_INDEX, $frontEndId);
     }
 
-    public function registerBlockId(int $frontEndId, int $dbId): self
+    public function registerBlockId(int|string $frontEndId, int $dbId): self
     {
         $this->pushToTempStore(self::BLOCK_ID_INDEX, $frontEndId, $dbId);
 
@@ -86,14 +86,14 @@ class TwillUtil
         );
     }
 
-    private function getFromTempStore(string $key, int $frontendId): ?int
+    private function getFromTempStore(string $key, int|string $frontendId): ?int
     {
         $data = Session::get(self::SESSION_FIELD, []);
 
         return $data[$key][$frontendId] ?? null;
     }
 
-    private function pushToTempStore(string $key, int $frontendId, int $dbId): void
+    private function pushToTempStore(string $key, int|string $frontendId, int $dbId): void
     {
         $sessionData = Session::get(self::SESSION_FIELD, []);
 

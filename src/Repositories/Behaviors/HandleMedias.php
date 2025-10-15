@@ -92,7 +92,7 @@ trait HandleMedias
                                     'crop_h' => $cropData['height'],
                                     'crop_x' => $cropData['x'],
                                     'crop_y' => $cropData['y'],
-                                    'metadatas' => json_encode($customMetadatas),
+                                    'metadatas' => $customMetadatas,
                                     'position' => $index + 1,
                                 ];
                             }
@@ -108,7 +108,7 @@ trait HandleMedias
                                     'crop_h' => null,
                                     'crop_x' => null,
                                     'crop_y' => null,
-                                    'metadatas' => json_encode($customMetadatas),
+                                    'metadatas' => $customMetadatas,
                                     'position' => $index + 1,
                                 ];
                             }
@@ -163,7 +163,7 @@ trait HandleMedias
             $itemForForm = $item->toCmsArray();
             $itemForForm['pivot_id'] = $item->pivot->id;
 
-            $itemForForm['metadatas']['custom'] = json_decode($item->pivot->metadatas, true);
+            $itemForForm['metadatas']['custom'] = $item->pivot->metadatas;
 
             foreach ($mediasById->groupBy('pivot.crop') as $crop => $mediaByCrop) {
                 $media = $mediaByCrop->first();

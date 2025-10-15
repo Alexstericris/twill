@@ -252,8 +252,7 @@ class BlockRenderer
         $renderer = new self();
 
         /** @var \A17\Twill\Models\Block[] $blocks */
-        $blocks = $model->blocks->where('editor_name', $editorName)->where('parent_id', null);
-
+        $blocks = $model->blocks()->where('editor_name', $editorName)->where('parent_id', null)->get();
         foreach ($blocks as $block) {
             $data = self::getNestedBlocksForBlock($block, $model, $editorName);
             $renderer->rootBlocks[] = $data;

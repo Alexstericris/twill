@@ -6,6 +6,8 @@ export const DUPLICATE_BLOCK = 'duplicateBlock'
 export const COPY_BLOCK = 'copyBlock'
 export const PASTE_BLOCK = 'pasteBlock'
 
+export const TOGGLE_BLOCK_IS_FAVORITE = 'toggleBlockIsFavorite'
+
 /* Repeaters */
 export const DUPLICATE_REPEATER = 'duplicateRepeater'
 
@@ -78,5 +80,6 @@ export default {
   DUPLICATE_BLOCK,
   COPY_BLOCK,
   PASTE_BLOCK,
-  DUPLICATE_REPEATER
+  DUPLICATE_REPEATER,
+  TOGGLE_BLOCK_IS_FAVORITE,
 }

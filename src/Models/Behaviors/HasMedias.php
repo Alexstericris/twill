@@ -3,6 +3,7 @@
 namespace A17\Twill\Models\Behaviors;
 
 use A17\Twill\Models\Media;
+use A17\Twill\Models\MediablePivot;
 use A17\Twill\Services\MediaLibrary\ImageService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -44,23 +45,24 @@ trait HasMedias
             Media::class,
             'mediable',
             config('twill.mediables_table', 'twill_mediables')
-        )->withPivot([
-            'id',
-            'crop',
-            'role',
-            'crop_w',
-            'crop_h',
-            'crop_x',
-            'crop_y',
-            'lqip_data',
-            'ratio',
-            'metadatas',
-            'locale',
-        ])->withTimestamps()
+        )
+            ->using(MediablePivot::class)
+            ->withPivot([
+                'id',
+                'crop',
+                'role',
+                'crop_w',
+                'crop_h',
+                'crop_x',
+                'crop_y',
+                'lqip_data',
+                'ratio',
+                'metadatas',
+                'locale',
+            ])
             ->orderBy(config('twill.mediables_table', 'twill_mediables') . '.position')
             ->orderBy(config('twill.mediables_table', 'twill_mediables') . '.id');
     }
-
     private function findMedia($role, $crop = 'default')
     {
         $media = $this->medias->first(function ($media) use ($role, $crop) {

@@ -228,13 +228,11 @@ if (! function_exists('generate_list_of_available_blocks')) {
         if ($settingsOnly) {
             $blockList = TwillBlocks::getSettingsBlocks();
         } else {
-            $blockList = TwillBlocks::getBlocks();
+            $blockList = TwillBlocks::getBlocks(withFavoriteBlocks: true);
         }
-
         $appBlocksList = $blockList->filter(function (Block $block) {
             return $block->source !== A17\Twill\Services\Blocks\Block::SOURCE_TWILL;
         });
-
         $finalBlockList = $blockList->filter(
             function (Block $block) use ($blocks, $groups, $appBlocksList, $excludeBlocks) {
                 if ($block->group === A17\Twill\Services\Blocks\Block::SOURCE_TWILL) {
@@ -257,12 +255,10 @@ if (! function_exists('generate_list_of_available_blocks')) {
                 if (in_array($block->name, $excludeBlocks)) {
                     return false;
                 }
-
                 return (filled($blocks) ? collect($blocks)->contains($block->name) || collect($blocks)->contains(ltrim($block->componentClass, '\\')) : true)
                     && (filled($groups) ? collect($groups)->contains($block->group) : true);
             }
         );
-
         // Sort them by the original definition
         return $finalBlockList->sortBy(function (Block $b) use ($blocks) {
             return collect($blocks)->search(function ($id, $key) use ($b) {

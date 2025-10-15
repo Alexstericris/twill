@@ -62,7 +62,14 @@ const state = {
    * @type {String}
    */
   blockPreviewUrl: window[process.env.VUE_APP_NAME].STORE.form.blockPreviewUrl || '',
+  /**
+   * Url to prompt ai
+   */
   aiPromptUrl: window[process.env.VUE_APP_NAME].STORE.form.aiPromptUrl || '',
+  /**
+   * Url to toggle is_favorite
+   */
+  toggleBlockIsFavoriteUrl: window[process.env.VUE_APP_NAME].STORE.form.toggleBlockIsFavoriteUrl || '',
   /**
    * Form errors after submitting
    * @type {Object}
@@ -87,7 +94,7 @@ const state = {
 
 // getters
 const getters = {
-  fieldsByName (state) {
+  fieldsByName(state) {
     return name => state.fields.filter(function (field) {
       return field.name === name
     })
@@ -95,7 +102,7 @@ const getters = {
   fieldValueByName: (state, getters) => name => { // want to use getters
     return getters.fieldsByName(name).length ? getters.fieldsByName(name)[0].value : ''
   },
-  modalFieldsByName (state) {
+  modalFieldsByName(state) {
     return name => state.modalFields.filter(function (field) {
       return field.name === name
     })
@@ -107,28 +114,28 @@ const getters = {
 }
 
 const mutations = {
-  [FORM.UPDATE_FORM_PERMALINK] (state, newValue) {
+  [FORM.UPDATE_FORM_PERMALINK](state, newValue) {
     if (newValue && newValue !== '') {
       state.permalink = newValue
     }
   },
-  [FORM.PREVENT_SUBMIT] (state) {
+  [FORM.PREVENT_SUBMIT](state) {
     state.isSubmitPrevented = true
   },
-  [FORM.ALLOW_SUBMIT] (state) {
+  [FORM.ALLOW_SUBMIT](state) {
     state.isSubmitPrevented = false
   },
   // ----------- Form fields ----------- //
-  [FORM.EMPTY_FORM_FIELDS] (state, status) {
+  [FORM.EMPTY_FORM_FIELDS](state, status) {
     state.fields = []
   },
-  [FORM.ADD_FORM_FIELDS] (state, fields) {
+  [FORM.ADD_FORM_FIELDS](state, fields) {
     state.fields = [...state.fields, ...fields]
   },
-  [FORM.REPLACE_FORM_FIELDS] (state, fields) {
+  [FORM.REPLACE_FORM_FIELDS](state, fields) {
     state.fields = fields
   },
-  [FORM.UPDATE_FORM_FIELD] (state, field) {
+  [FORM.UPDATE_FORM_FIELD](state, field) {
     let fieldValue = field.locale ? {} : null
     const fieldIndex = getFieldIndex(state.fields, field)
     // Update existing form field
@@ -146,12 +153,12 @@ const mutations = {
       value: fieldValue
     })
   },
-  [FORM.REMOVE_FORM_FIELD] (state, fieldName) {
+  [FORM.REMOVE_FORM_FIELD](state, fieldName) {
     state.fields.forEach(function (field, index) {
       if (field.name === fieldName) state.fields.splice(index, 1)
     })
   },
-  [FORM.DUPLICATE_BLOCK_FORM_FIELDS] (state, { fields, oldId, newId }) {
+  [FORM.DUPLICATE_BLOCK_FORM_FIELDS](state, { fields, oldId, newId }) {
     const newFields = []
 
     fields.forEach(field => {
@@ -163,13 +170,13 @@ const mutations = {
     state.fields = [...state.fields, ...newFields]
   },
   // ----------- Modal fields ----------- //
-  [FORM.EMPTY_MODAL_FIELDS] (state, status) {
+  [FORM.EMPTY_MODAL_FIELDS](state, status) {
     state.modalFields = []
   },
-  [FORM.REPLACE_MODAL_FIELDS] (state, fields) {
+  [FORM.REPLACE_MODAL_FIELDS](state, fields) {
     state.modalFields = fields
   },
-  [FORM.UPDATE_MODAL_FIELD] (state, field) {
+  [FORM.UPDATE_MODAL_FIELD](state, field) {
     let fieldValue = field.locale ? {} : null
     const fieldIndex = getFieldIndex(state.modalFields, field)
 
@@ -188,28 +195,28 @@ const mutations = {
       value: fieldValue
     })
   },
-  [FORM.REMOVE_MODAL_FIELD] (state, fieldName) {
+  [FORM.REMOVE_MODAL_FIELD](state, fieldName) {
     state.modalFields.forEach(function (field, index) {
       if (field.name === fieldName) state.modalFields.splice(index, 1)
     })
   },
   // ----------- Form errors and Loading ----------- //
-  [FORM.UPDATE_FORM_LOADING] (state, loading) {
+  [FORM.UPDATE_FORM_LOADING](state, loading) {
     state.loading = loading || !state.loading
   },
-  [FORM.SET_FORM_ERRORS] (state, errors) {
+  [FORM.SET_FORM_ERRORS](state, errors) {
     state.errors = errors
   },
-  [FORM.CLEAR_FORM_ERRORS] (state) {
+  [FORM.CLEAR_FORM_ERRORS](state) {
     state.errors = []
   },
-  [FORM.UPDATE_FORM_SAVE_TYPE] (state, type) {
+  [FORM.UPDATE_FORM_SAVE_TYPE](state, type) {
     state.type = type
   }
 }
 
 const actions = {
-  [ACTIONS.HANDLE_ERRORS] ({ commit, state, getters, rootState }, errors) {
+  [ACTIONS.HANDLE_ERRORS]({ commit, state, getters, rootState }, errors) {
     const repeaters = rootState.repeaters.repeaters
     // Translate the errors to their respective fields.
     Object.keys(errors).forEach((errorKey) => {
@@ -231,7 +238,7 @@ const actions = {
 
     commit(FORM.SET_FORM_ERRORS, errors)
   },
-  [ACTIONS.REPLACE_FORM] ({ commit, state, getters, rootState, dispatch }, endpoint) {
+  [ACTIONS.REPLACE_FORM]({ commit, state, getters, rootState, dispatch }, endpoint) {
     return new Promise((resolve, reject) => {
       commit(FORM.CLEAR_FORM_ERRORS)
       commit(NOTIFICATION.CLEAR_NOTIF, 'error')
@@ -260,7 +267,7 @@ const actions = {
       })
     })
   },
-  [ACTIONS.UPDATE_FORM_IN_LISTING] ({ commit, state, getters, rootState }, options) {
+  [ACTIONS.UPDATE_FORM_IN_LISTING]({ commit, state, getters, rootState }, options) {
     return new Promise((resolve, reject) => {
       commit(FORM.CLEAR_FORM_ERRORS)
       commit(NOTIFICATION.CLEAR_NOTIF, 'error')
@@ -286,7 +293,7 @@ const actions = {
       })
     })
   },
-  [ACTIONS.CREATE_FORM_IN_MODAL] ({ commit, state, getters, rootState }, options) {
+  [ACTIONS.CREATE_FORM_IN_MODAL]({ commit, state, getters, rootState }, options) {
     return new Promise((resolve, reject) => {
       commit(FORM.CLEAR_FORM_ERRORS)
       commit(NOTIFICATION.CLEAR_NOTIF, 'error')
@@ -315,7 +322,7 @@ const actions = {
       })
     })
   },
-  [ACTIONS.SAVE_FORM] ({ commit, state, getters, rootState, dispatch }, saveType) {
+  [ACTIONS.SAVE_FORM]({ commit, state, getters, rootState, dispatch }, saveType) {
     commit(FORM.CLEAR_FORM_ERRORS)
     commit(NOTIFICATION.CLEAR_NOTIF, 'error')
 
@@ -358,11 +365,11 @@ const actions = {
       }
     })
   },
-  async [ACTIONS.DUPLICATE_BLOCK] ({ commit, getters }, { block, id }) {
+  async [ACTIONS.DUPLICATE_BLOCK]({ commit, getters }, { block, id }) {
     const fields = getters.fieldsByBlockId(block.id)
     commit(FORM.DUPLICATE_BLOCK_FORM_FIELDS, { fields, oldId: block.id, newId: id })
   },
-  async [ACTIONS.PASTE_BLOCK] ({ commit, getters }, { block, id }) {
+  async [ACTIONS.PASTE_BLOCK]({ commit, getters }, { block, id }) {
     const fields = getters.fieldsByBlockId(block.id)
     commit(FORM.DUPLICATE_BLOCK_FORM_FIELDS, { fields, oldId: block.id, newId: id })
   }

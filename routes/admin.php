@@ -1,12 +1,16 @@
 <?php
 
 use A17\Twill\Http\Controllers\Admin\AppSettingsController;
+use A17\Twill\Http\Controllers\Admin\FavoriteController;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use A17\Twill\Facades\TwillRoutes;
 
 if (config('twill.enabled.users-management')) {
     TwillRoutes::module('users', ['except' => ['sort', 'feature']]);
+    TwillRoutes::module('favorites');
+    Route::post('favorites/toggleisfavorite', [FavoriteController::class , 'toggleBlockIsFavorite'])->name('favorites.toggleisfavorite');
+
     Route::name('users.resend.registrationEmail')->get('users/{user}/registration-email', 'UserController@resendRegistrationEmail');
 
     if (config('twill.enabled.permissions-management')) {
@@ -41,9 +45,10 @@ if (config('twill.enabled.file-library')) {
 
 if (config('twill.enabled.block-editor')) {
     Route::post('blocks/preview', ['as' => 'blocks.preview', 'uses' => 'BlocksController@preview']);
+    Route::post('blocks/toggleisfavorite', ['as' => 'blocks.toggleisfavorite', 'uses' => 'BlocksController@toggleBlockIsFavorite']);
 }
 if (config('twill.enabled.ai', true)) {
-    Route::post('ai/prompt', [\A17\Twill\Http\Controllers\Admin\AiController::class,'prompt'])->name('ai.prompt');
+    Route::post('ai/prompt', [\A17\Twill\Http\Controllers\Admin\AiController::class, 'prompt'])->name('ai.prompt');
 }
 
 if (config('twill.enabled.buckets')) {

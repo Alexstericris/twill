@@ -11,7 +11,8 @@ import ACTIONS from '@/store/actions'
 import { buildBlock, isBlockEmpty } from '@/utils/getFormData.js'
 
 import api from '../api/blocks'
-import { BLOCKS } from '../mutations'
+import { BLOCKS, FORM } from '../mutations'
+import { UPDATE_BLOCK_PROPERTY } from '@/store/mutations/blocks'
 
 const state = {
   /**
@@ -50,7 +51,7 @@ const state = {
    */
   active: {},
 
-  blockClipboard: localStorage.getItem('blockClipboard')?JSON.parse(localStorage.getItem('blockClipboard')):null
+  blockClipboard: localStorage.getItem('blockClipboard') ? JSON.parse(localStorage.getItem('blockClipboard')) : null
 }
 
 // getters
@@ -66,8 +67,11 @@ const setBlockID = () => Date.now() + Math.floor(Math.random() * 1000)
 const mutations = {
   [BLOCKS.ADD_BLOCK](state, { block, index, editorName }) {
     const updated = state.blocks[editorName] || []
-    const newBlock = { ...block, id: setBlockID(), name: editorName }
-
+    const newBlock = {
+      ...block,
+      id: block.id ?? setBlockID(),
+      name: editorName
+    }
     // Metadata for rendering
     newBlock.twillUi = {}
     newBlock.twillUi.isNew = true
@@ -118,7 +122,6 @@ const mutations = {
     state.blockClipboard = block
   },
   [BLOCKS.PASTE_BLOCK](state, { editorName, index, id }) {
-    console.log('reachy breachy')
     const updated = state.blocks[editorName] || []
     updated.splice(index, 0, { ...state.blockClipboard, id, name: editorName })
     state.blockClipboard = null
@@ -142,6 +145,19 @@ const mutations = {
   },
   [BLOCKS.UPDATE_PREVIEW_LOADING](state, loading) {
     state.loading = !state.loading
+  },
+  [BLOCKS.TOGGLE_BLOCK_IS_FAVORITE](state, { block, favoriteBlockName }) {
+    if (!block.favorite) {
+      block.favorite = {}
+      block.favorite.original_block_id = block.id
+      block.favorite.title = favoriteBlockName
+      return
+    }
+    block.favorite.original_block_id = block.id
+    block.favorite.title = ''
+  },
+  [BLOCKS.UPDATE_BLOCK_PROPERTY](state, { block,key,val }) {
+    Vue.set(block,key,val)
   }
 }
 
@@ -179,8 +195,14 @@ const getBlockPreview = (block, commit, rootState, callback) => {
 }
 
 const actions = {
-  [ACTIONS.GET_PREVIEW] ({ commit, state, rootState }, { editorName, index = -1 }) {
-    let block = state.blocks[editorName] && index >= 0 ? { ...state.blocks[editorName][index] } : {}
+  [ACTIONS.GET_PREVIEW](
+    { commit, state, rootState },
+    { editorName, index = -1 }
+  ) {
+    let block =
+      state.blocks[editorName] && index >= 0
+        ? { ...state.blocks[editorName][index] }
+        : {}
 
     // refresh preview of the active block
     if (state.active && state.active.hasOwnProperty('id') && index === -1) {
@@ -189,30 +211,68 @@ const actions = {
 
     getBlockPreview(block, commit, rootState)
   },
-  [ACTIONS.GET_ALL_PREVIEWS] ({ commit, state, rootState }, { editorName }) {
-    if (state.blocks[editorName] && state.blocks[editorName].length > 0 && !state.loading) {
+  [ACTIONS.GET_ALL_PREVIEWS]({ commit, state, rootState }, { editorName }) {
+    if (
+      state.blocks[editorName] &&
+      state.blocks[editorName].length > 0 &&
+      !state.loading
+    ) {
       commit(BLOCKS.UPDATE_PREVIEW_LOADING, true)
       let loadedPreview = 0
       const previewToload = state.blocks[editorName].length
 
-      Object.values(state.blocks[editorName]).forEach((block) => {
+      Object.values(state.blocks[editorName]).forEach(block => {
         getBlockPreview(block, commit, rootState, () => {
           loadedPreview++
-          if (loadedPreview === previewToload) commit(BLOCKS.UPDATE_PREVIEW_LOADING, true)
+          if (loadedPreview === previewToload)
+            commit(BLOCKS.UPDATE_PREVIEW_LOADING, true)
         })
       })
     }
   },
-  async [ACTIONS.DUPLICATE_BLOCK] ({ commit, state, rootState }, { editorName, futureIndex, block, id }) {
-    commit(BLOCKS.DUPLICATE_BLOCK, { editorName, index: futureIndex, block, id })
+  async [ACTIONS.DUPLICATE_BLOCK](
+    { commit, state, rootState },
+    { editorName, futureIndex, block, id }
+  ) {
+    commit(BLOCKS.DUPLICATE_BLOCK, {
+      editorName,
+      index: futureIndex,
+      block,
+      id
+    })
   },
-  async [ACTIONS.COPY_BLOCK] ({ commit, state, rootState }, { editorName, futureIndex, block, id }) {
+  async [ACTIONS.COPY_BLOCK](
+    { commit, state, rootState },
+    { editorName, futureIndex, block, id }
+  ) {
     commit(BLOCKS.COPY_BLOCK, { editorName, index: futureIndex, block, id })
   },
-  async [ACTIONS.PASTE_BLOCK] ({ commit, state, rootState }, { editorName, futureIndex, id }) {
+  async [ACTIONS.PASTE_BLOCK](
+    { commit, state, rootState },
+    { editorName, futureIndex, id }
+  ) {
     commit(BLOCKS.PASTE_BLOCK, { editorName, index: futureIndex, id })
   },
-  async [ACTIONS.MOVE_BLOCK_TO_EDITOR] ({ commit, dispatch }, { editorName, index, block, futureIndex, id }) {
+  async [ACTIONS.TOGGLE_BLOCK_IS_FAVORITE](
+    { commit, state, rootState },
+    { block, favoriteBlockName }
+  ) {
+    commit(BLOCKS.TOGGLE_BLOCK_IS_FAVORITE, { block, favoriteBlockName })
+    api.toggleIsFavorite(
+      rootState.form.toggleBlockIsFavoriteUrl,
+      { favorite: block.favorite },
+      data => {
+        commit(BLOCKS.UPDATE_BLOCK_PROPERTY, { block,key:'favorite',val: data.block.favorite })
+      },
+      errorResponse => {
+        console.log(errorResponse)
+      }
+    )
+  },
+  async [ACTIONS.MOVE_BLOCK_TO_EDITOR](
+    { commit, dispatch },
+    { editorName, index, block, futureIndex, id }
+  ) {
     await dispatch(ACTIONS.DUPLICATE_BLOCK, {
       editorName,
       futureIndex,
@@ -223,7 +283,7 @@ const actions = {
       editorName: block.name,
       index
     })
-  }
+  },
 }
 
 export default {

@@ -2306,6 +2306,7 @@ abstract class ModuleController extends Controller
                     'blocks'
                 ) && ! $this->disableEditor,
                 'blockPreviewUrl' => Route::has(config('twill.admin_route_name_prefix') . 'blocks.preview') ? URL::route(config('twill.admin_route_name_prefix') . 'blocks.preview') : '#',
+                'toggleBlockIsFavoriteUrl' => Route::has(config('twill.admin_route_name_prefix') . 'favorites.toggleisfavorite') ? URL::route(config('twill.admin_route_name_prefix') . 'favorites.toggleisfavorite') : '#',
                 'aiPromptUrl' => Route::has(config('twill.admin_route_name_prefix') . 'ai.prompt') ? URL::route(config('twill.admin_route_name_prefix') . 'ai.prompt') : '#',
                 'revisions' => $this->moduleHas('revisions') ? $item->revisionsArray() : null,
                 'submitOptions' => $this->getSubmitOptions($item),

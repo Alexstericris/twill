@@ -3,6 +3,7 @@
 namespace A17\Twill\Models;
 
 use A17\Twill\Facades\TwillUtil;
+use A17\Twill\Models\Behaviors\HasFavorites;
 use A17\Twill\Models\Behaviors\HasFiles;
 use A17\Twill\Models\Behaviors\HasMedias;
 use A17\Twill\Models\Behaviors\HasPresenter;
@@ -19,6 +20,7 @@ class Block extends BaseModel implements TwillModelContract
     use HasFiles;
     use HasPresenter;
     use HasRelated;
+    use HasFavorites;
 
     public $timestamps = false;
 
@@ -80,7 +82,7 @@ class Block extends BaseModel implements TwillModelContract
         $value = $this->content[$name] ?? null;
 
         $locale = $forceLocale ?? (
-        config('translatable.use_property_fallback', false) && (! array_key_exists(
+        config('translatable.use_property_fallback', false) && (!array_key_exists(
             app()->getLocale(),
             array_filter($value ?? []) ?? []
         ))

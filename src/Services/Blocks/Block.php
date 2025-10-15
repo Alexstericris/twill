@@ -99,6 +99,25 @@ class Block
      * @var bool
      */
     public $isNewFormat;
+    /**
+     * @var bool
+     */
+    public $isFavorite = false;
+
+    public $id;
+
+    public $parent_id;
+
+    /**
+     * @var array
+     */
+    public $fields;
+
+    /**
+     * @var array
+     */
+    public $editors = [];
+
 
     /**
      * @var \Symfony\Component\Finder\SplFileInfo
@@ -220,7 +239,7 @@ class Block
             $blocksList = TwillBlocks::getRepeaters();
         } else {
             // Here we include the settings blocks as well.
-            $blocksList = TwillBlocks::getBlocks(true);
+            $blocksList = TwillBlocks::getBlocks(true,true);
         }
 
         return $blocksList->first(function (self $blockConfig) use ($type) {
@@ -234,9 +253,8 @@ class Block
             $blocksList = TwillBlocks::getRepeaters();
         } else {
             // Here we include the settings blocks as well.
-            $blocksList = TwillBlocks::getBlocks(true);
+            $blocksList = TwillBlocks::getBlocks(true,true);
         }
-
         return $blocksList->first(function (self $blockConfig) use ($type) {
             return $blockConfig->component === $type;
         });

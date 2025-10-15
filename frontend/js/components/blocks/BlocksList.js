@@ -84,8 +84,6 @@ export default {
       })
     },
     copyBlock({ block }) {
-      console.log('reachy2')
-      console.log(block)
       this.$store.dispatch(ACTIONS.COPY_BLOCK, {
         editorName: this.editorName,
         block,
@@ -93,8 +91,15 @@ export default {
       })
     },
     pasteBlock({ block, index }) {
-      console.log('rechy3')
       this.$store.dispatch(ACTIONS.PASTE_BLOCK, {
+        editorName: this.editorName,
+        futureIndex: index,
+        block,
+        id: Date.now() + Math.floor(Math.random() * 1000)
+      })
+    },
+    toggleBlockIsFavorite({block,index}) {
+      this.$store.dispatch(ACTIONS.TOGGLE_BLOCK_IS_FAVORITE, {
         editorName: this.editorName,
         futureIndex: index,
         block,

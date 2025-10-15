@@ -2,13 +2,19 @@
 
 namespace A17\Twill;
 
+use A\B;
+use A17\Twill\Helpers\BlockRenderer;
+use A17\Twill\Models\Favorite;
+use A17\Twill\Repositories\FavoriteRepository;
 use A17\Twill\Services\Blocks\Block;
 use A17\Twill\Services\Blocks\BlockCollection;
+use A17\Twill\Services\Blocks\RenderData;
 use A17\Twill\Services\Forms\InlineRepeater;
 use A17\Twill\View\Components\Blocks\TwillBlockComponent;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -45,7 +51,7 @@ class TwillBlocks
     public static $manualBlocks = [];
 
     /**
-     * @return A17\Twill\Services\Blocks\BlockCollection
+     * @return BlockCollection
      */
     private ?BlockCollection $blockCollection = null;
 
@@ -60,7 +66,7 @@ class TwillBlocks
      */
     public function registerPackageBlocksDirectory(string $path, string $renderNamespace = null): void
     {
-        if (! isset(self::$blockDirectories[$path])) {
+        if (!isset(self::$blockDirectories[$path])) {
             if (isset($this->blockCollection)) {
                 $this->getBlockCollection()->merge(
                     $this->readBlocksFromDirectory($path, Block::SOURCE_VENDOR, Block::TYPE_BLOCK)
@@ -101,7 +107,7 @@ class TwillBlocks
 
     public function registerComponentBlocks(string $namespace, string $path): void
     {
-        if (! Str::startsWith($namespace, '\\')) {
+        if (!Str::startsWith($namespace, '\\')) {
             $namespace = '\\' . $namespace;
         }
 
@@ -117,7 +123,7 @@ class TwillBlocks
      */
     public function registerPackageRepeatersDirectory(string $path, string $renderNamespace = null): void
     {
-        if (! isset(self::$repeatersDirectories[$path])) {
+        if (!isset(self::$repeatersDirectories[$path])) {
             if (isset($this->blockCollection)) {
                 $this->getBlockCollection()->merge(
                     $this->readBlocksFromDirectory($path, Block::SOURCE_VENDOR, Block::TYPE_REPEATER)
@@ -136,7 +142,7 @@ class TwillBlocks
      */
     public function getBlockCollection(): BlockCollection
     {
-        if (! isset($this->blockCollection)) {
+        if (!isset($this->blockCollection)) {
             $this->blockCollection = new BlockCollection();
         }
 
@@ -204,7 +210,7 @@ class TwillBlocks
         $this->discoverDynamicRepeaters($this->blockCollection);
 
         foreach (self::$dynamicRepeaters as $name => $dynamicRepeater) {
-            if (! isset(self::$loadedDynamicRepeaters[$name])) {
+            if (!isset(self::$loadedDynamicRepeaters[$name])) {
                 $this->blockCollection->add($dynamicRepeater->asBlock());
                 self::$loadedDynamicRepeaters[$name] = true;
             }
@@ -213,7 +219,7 @@ class TwillBlocks
         // remove duplicate Twill blocks
         $appBlocks = $this->blockCollection->where('source', '!=', Block::SOURCE_TWILL);
         $this->blockCollection = $this->blockCollection->filter(function ($item) use ($appBlocks) {
-            return ! $appBlocks->contains(function ($block) use ($item) {
+            return !$appBlocks->contains(function ($block) use ($item) {
                 return $item->source === Block::SOURCE_TWILL && $item->name === $block->name;
             });
         });
@@ -262,20 +268,53 @@ class TwillBlocks
     /**
      * @return Collection|Block[]
      */
-    public function getBlocks(bool $withSettingsBlocks = false): Collection
+    public function getBlocks(bool $withSettingsBlocks = false, bool $withFavoriteBlocks = false): Collection
     {
         $blocks = $this->getBlockCollection()->getBlockList();
-
         if ($withSettingsBlocks) {
             return $blocks->merge($this->getSettingsBlocks());
         }
-
+        if ($withFavoriteBlocks) {
+            return $blocks->merge($this->getFavoriteBlocks());
+        }
         return $blocks;
     }
 
     public function getSettingsBlocks(): Collection
     {
         return $this->getBlockCollection()->getSettingsList();
+    }
+
+    public function getFavoriteBlocks(): Collection
+    {
+        $favorites = Favorite::query()->with('blocks')->get();
+        $favoriteRepository = app(FavoriteRepository::class);
+        $blockCollection = new BlockCollection();
+
+        foreach ($favorites as $favorite) {
+            $block = $favorite->blocks[0];
+            $originalBlock = $this->blockCollection->findByName($block->type);
+            $blockCopy = clone $originalBlock;
+            $blockCopy->id = 'fake_' . $block->id;
+            $blockCopy->title = $favorite->title;
+            $blockCopy->icon = 'star-feature';
+            $blockCopy->isFavorite = true;
+            $blockCopy->fields = $favoriteRepository->withFakeIds('fake_')->getFormFieldsHandleBlocks($favorite, []);
+//            foreach ($favorite->blocks()->whereNotNull('parent_id')->get() as $favoriteBlock) {
+//                $availableBlock = $this->blockCollection->findByName($favoriteBlock->type);
+//                $blockItem = $favoriteRepository->getBlockItem($favoriteBlock, $availableBlock, 'fake_');
+//                $blockCopy->editors = array_merge_recursive($blockCopy->editors, $favoriteRepository->getBlockEditors([], $favoriteBlock, $blockItem, $availableBlock, 'fake_'));
+//                foreach ($blockCopy->editors['blocks'] as &$editorBlocks) {
+//                    foreach ($editorBlocks as &$editorBlock) {
+//                        $dbEditorBlock = $favorite->blocks()->whereId(str_replace('fake_', '', $editorBlock['id']))->get()->first();
+//                        $editorBlock['fields']['blocksFields'] = $favoriteRepository->getBlockFormFields($dbEditorBlock, 'fake_');
+//                    }
+//                }
+//            }
+//            $blockCopy->editors = $blockCopy->editors['blocks'];
+            $blockCollection->add($blockCopy);
+        }
+        return $blockCollection;
     }
 
     /**
@@ -290,12 +329,13 @@ class TwillBlocks
      * Gets the collection of Block objects from a given directory.
      */
     public function readBlocksFromDirectory(
-        string $directory,
-        string $source,
-        string $type,
+        string  $directory,
+        string  $source,
+        string  $type,
         ?string $renderNamespace = null
-    ): Collection {
-        if (! File::exists($directory)) {
+    ): Collection
+    {
+        if (!File::exists($directory)) {
             return new Collection();
         }
 
@@ -310,12 +350,12 @@ class TwillBlocks
      */
     public function getAllCropConfigs($prefixKey = false): array
     {
-        if (! $this->cropConfigs) {
+        if (!$this->cropConfigs) {
             $this->cropConfigs = config()->get('twill.block_editor.crops');
 
             /** @var Block $block */
             foreach ($this->getBlockCollection() as $block) {
-                if (! $block->componentClass) {
+                if (!$block->componentClass) {
                     continue;
                 }
 
